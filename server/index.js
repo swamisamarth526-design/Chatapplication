@@ -16,16 +16,21 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static(clientBuildPath));
 }
 
+const mongoUrl =
+  process.env.MONGO_URL || "mongodb://127.0.0.1:27017/chat-app";
+
 mongoose
-  .connect(process.env.MONGO_URL, {
+  .connect(mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 10000,
   })
   .then(() => {
-    console.log("DB Connetion Successfull");
+    console.log("DB Connection Successful");
   })
   .catch((err) => {
-    console.log(err.message);
+    console.error("DB connection error:", err.message);
+    process.exit(1);
   });
 
 app.get("/ping", (_req, res) => {
